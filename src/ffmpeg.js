@@ -185,6 +185,12 @@ class FFMPEG extends events.EventEmitter {
                 currentVideo = "[deinterlaced]";
             }
 
+            // crop to stream aspect ratio (hardcoded to 4:3)
+            if (this.wantedW / 4 === this.wantedH / 3) {
+                videoComplex += `;${currentVideo}crop=min(iw,ih/3*4):ih[cropped]`;
+                currentVideo = "[cropped]";
+            }
+
             // prepare input streams
             if  ( ( typeof(streamUrl.errorTitle) !== 'undefined') || (streamStats.audioOnly) ) {
                 doOverlay = false; //never show icon in the error screen
