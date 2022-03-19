@@ -185,6 +185,20 @@ class FFMPEG extends events.EventEmitter {
                 currentVideo = "[deinterlaced]";
             }
 
+            // do a check on whether the source is DVD.
+            // if so, we want to crop for overscan and scale to 4:3
+            // as well as adding a dedot filter for NTSC artifact reduction.
+            if (iW === 720 && iH === 480) {
+                videoComplex += `;${currentVideo}dedot=m=dotcrawl[lumadedotted]`;
+                currentVideo = "[lumadedotted]";
+                videoComplex += `;${currentVideo}dedot=m=rainbows[derainbowed]`;
+                currentVideo = "[derainbowed]";
+                videoComplex += `;${currentVideo}crop=w=708:h=480[cropped]`;
+                currentVideo = "[cropped]";
+                videoComplex += `;${currentVideo}scale=iw:iw/4*3[fullscaled]`;
+                currentVideo = "[fullscaled]";
+            }
+
             // prepare input streams
             if  ( ( typeof(streamUrl.errorTitle) !== 'undefined') || (streamStats.audioOnly) ) {
                 doOverlay = false; //never show icon in the error screen
